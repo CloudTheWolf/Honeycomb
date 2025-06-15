@@ -13,7 +13,7 @@ function Root() {
     const location = useLocation()
     const path = location.pathname
 
-    const isProtectedPath = path !== '/' && !path.startsWith('/public')  && path !== '/install' && path !== '/upgrade'
+    const isProtectedPath = path !== '/' && !path.startsWith('/public')   && path !== '/install' && path !== '/upgrade'
 
     useEffect(() => {
         if (!loading && !isAuthenticated && isProtectedPath) {

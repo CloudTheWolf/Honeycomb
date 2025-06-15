@@ -9,11 +9,11 @@ import {users, version} from "@server/db/schema";
 import { eq } from "drizzle-orm";
 import { Application_Version } from "@server/core/version.core";
 import semver from 'semver';
-const installStatus = new Hono()
+const installStatusRouter = new Hono()
 
 
 
-installStatus.get('/', async (c) => {
+installStatusRouter.get('/', async (c) => {
     try {
         const dbVersion = await db.select().from(version).where(eq(version.item,'honeycomb-core'))
         console.log(dbVersion)
@@ -33,7 +33,7 @@ installStatus.get('/', async (c) => {
 });
 
 
-installStatus.post('/migrate', async (c) => {
+installStatusRouter.post('/migrate', async (c) => {
     try {
         await migrate(db, { migrationsFolder: 'server/db/migrations' });
         await db.insert(version).values({item: 'honeycomb-core', version_str: Application_Version})
@@ -45,7 +45,7 @@ installStatus.post('/migrate', async (c) => {
     }
 });
 
-installStatus.post('/create-user', async (c) => {
+installStatusRouter.post('/create-user', async (c) => {
     const { username, email, password } = await c.req.json();
 
     if (!email || !password) {
@@ -71,4 +71,4 @@ installStatus.post('/create-user', async (c) => {
     return c.json({ success: true });
 });
 
-export default  installStatus
+export default  installStatusRouter

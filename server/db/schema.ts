@@ -1,5 +1,5 @@
 import {
-    int,
+    int, longtext,
     mysqlTable,
     timestamp,
     tinyint,
@@ -16,6 +16,15 @@ export const users = mysqlTable("users", {
     role: int("role").notNull().default(1),
     created_at: timestamp('created_at',{mode: 'string'}).defaultNow(),
     updated_at: timestamp('updated_at',{mode: 'string'}).defaultNow(),
+});
+
+export const sessions = mysqlTable('sessions', {
+    id: int('id').primaryKey().autoincrement(),
+    userId: int('user_id').notNull(),
+    accessToken: longtext('access_token').notNull(),
+    refreshToken: longtext('refresh_token').notNull(),
+    isRevoked: tinyint('is_revoked').notNull().default(0),
+    expiresAt: timestamp('expires_at').notNull()
 });
 
 export const version = mysqlTable("version", {

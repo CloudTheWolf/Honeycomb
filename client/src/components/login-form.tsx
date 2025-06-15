@@ -1,38 +1,102 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useForm } from '@tanstack/react-form'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+                            className,
+                            ...props
+                          }: React.ComponentProps<'div'>) {
+  const form = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        const res = await fetch('/api/authentication/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(value),
+        })
+
+        if (!res.ok) throw new Error('Login failed')
+
+        const json = await res.json()
+        console.log('Login success:', json)
+
+        // You might want to redirect or refresh the user context
+      } catch (err) {
+        console.error(err)
+        alert('Login failed. Please check your credentials.')
+      }
+    },
+  })
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2">
+      <div className={cn('flex flex-col gap-6', className)} {...props}>
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col items-center gap-2">
               <div className="flex size-18 items-center justify-center rounded-md">
                 <img src="icon.svg" alt="Icon" />
               </div>
               <span className="sr-only">Honeycomb</span>
-
-            <h1 className="text-xl font-bold">Welcome to Honeycomb.</h1>
-          </div>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-3">
-              <Label htmlFor="email">Username</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
+              <h1 className="text-xl font-bold">Welcome to Honeycomb.</h1>
             </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
+
+            <div className="flex flex-col gap-6">
+              <form.Field
+                  name="username"
+                  children={(field) => (
+                      <div className="grid gap-3">
+                        <Label htmlFor={field.name}>Username Or Email Address</Label>
+                        <Input
+                            id={field.name}
+                            type="text"
+                            placeholder="MyUser"
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            required
+                        />
+                      </div>
+                  )}
+              />
+
+              <form.Field
+                  name="password"
+                  children={(field) => (
+                      <div className="grid gap-3">
+                        <Label htmlFor={field.name}>Password</Label>
+                        <Input
+                            id={field.name}
+                            type="password"
+                            placeholder="P@ssw0rd"
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            required
+                        />
+                      </div>
+                  )}
+              />
+
+              <Button type="submit" className="w-full" disabled={form.state.isSubmitting}>
+                {form.state.isSubmitting ? 'Logging in…' : 'Login'}
+              </Button>
+            </div>
           </div>
+        </form>
+      </div>
+  )
+}
+
+
+/* We'll add SSO later
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-neutral-900 text-muted-foreground relative z-10 px-2">
               Or
@@ -49,8 +113,4 @@ export function LoginForm({
               Continue with Google
             </Button>
           </div>
-        </div>
-      </form>
-    </div>
-  )
-}
+ */

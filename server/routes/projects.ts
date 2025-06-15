@@ -1,9 +1,9 @@
 import {Hono} from "hono";
 
-const projects = new Hono();
+const projectsRouter = new Hono();
 
-projects.get('/', async (ctx) => {
+projectsRouter.get('/', async (ctx) => {
     return ctx.json({message: "ok"})
 })
 
-export default projects;
+export default projectsRouter;
