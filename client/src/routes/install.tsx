@@ -53,6 +53,10 @@ function Install() {
         else setError(json.error || 'User creation failed');
     };
 
+    const goHome = () => {
+        window.location.reload();
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
             <div className="max-w-md mx-auto p-6 rounded-lg shadow-xl bg-white dark:bg-gray-900 space-y-6">
@@ -113,7 +117,11 @@ function Install() {
                     <div className="text-center space-y-4">
                         <p>Setup complete!</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">You can now log in and start using the
-                            system.</p>
+                            application.</p>
+                        <button onClick={goHome} disabled={loading}
+                                className="bg-green-600 text-white px-4 py-2 rounded">
+                            Return to Application
+                        </button>
                     </div>
                 )}
             </div>

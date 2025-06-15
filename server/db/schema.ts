@@ -17,3 +17,8 @@ export const users = mysqlTable("users", {
     created_at: timestamp('created_at',{mode: 'string'}).defaultNow(),
     updated_at: timestamp('updated_at',{mode: 'string'}).defaultNow(),
 });
+
+export const version = mysqlTable("version", {
+    item: varchar("item",{length: 50}).notNull().unique(),
+    version_str: varchar("version_str",{length: 50}).notNull()
+})

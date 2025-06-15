@@ -1,5 +1,6 @@
 import {createContext, type ReactNode, useContext, useEffect, useState,} from 'react'
 import type {InferSelectModel} from 'drizzle-orm'
+//@ts-ignore
 import {users} from '@server/db/schema'
 
 type User = InferSelectModel<typeof users>
@@ -53,7 +54,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (data.loggedIn) {
                     setIsAuthenticated(true)
 
-                    // ✅ Fetch /me
                     const meRes = await fetch('/api/authentication/me', {
                         credentials: 'include',
                     })

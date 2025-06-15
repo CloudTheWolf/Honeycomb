@@ -11,10 +11,17 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as UpgradeImport } from './routes/upgrade'
 import { Route as InstallImport } from './routes/install'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const UpgradeRoute = UpgradeImport.update({
+  id: '/upgrade',
+  path: '/upgrade',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const InstallRoute = InstallImport.update({
   id: '/install',
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstallImport
       parentRoute: typeof rootRoute
     }
+    '/upgrade': {
+      id: '/upgrade'
+      path: '/upgrade'
+      fullPath: '/upgrade'
+      preLoaderRoute: typeof UpgradeImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/install': typeof InstallRoute
+  '/upgrade': typeof UpgradeRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/install': typeof InstallRoute
+  '/upgrade': typeof UpgradeRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/install': typeof InstallRoute
+  '/upgrade': typeof UpgradeRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/install'
+  fullPaths: '/' | '/install' | '/upgrade'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/install'
-  id: '__root__' | '/' | '/install'
+  to: '/' | '/install' | '/upgrade'
+  id: '__root__' | '/' | '/install' | '/upgrade'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   InstallRoute: typeof InstallRoute
+  UpgradeRoute: typeof UpgradeRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   InstallRoute: InstallRoute,
+  UpgradeRoute: UpgradeRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/install"
+        "/install",
+        "/upgrade"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/install": {
       "filePath": "install.tsx"
+    },
+    "/upgrade": {
+      "filePath": "upgrade.tsx"
     }
   }
 }

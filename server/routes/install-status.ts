@@ -5,20 +5,30 @@ import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { db } from '@server/db/db';
 import { writeFileSync } from 'fs';
 import bcrypt from 'bcryptjs'
-import {users} from "@server/db/schema";
-import {eq} from "drizzle-orm";
+import {users, version} from "@server/db/schema";
+import { eq } from "drizzle-orm";
+import { Application_Version } from "@server/core/version.core";
+import semver from 'semver';
 const installStatus = new Hono()
 
 
 
-installStatus.get('/', (c) => {
+installStatus.get('/', async (c) => {
     try {
-        const parsed = parse(readFileSync('.env', 'utf-8'));
-        const installed = !!parsed.INSTALL_VERSION || existsSync('./INSTALLED');
+        const dbVersion = await db.select().from(version).where(eq(version.item,'honeycomb-core'))
+        console.log(dbVersion)
+        const hasExistingVersion = dbVersion.length  > 0;
+        let hasUpgrade = false
+        if(dbVersion.length > 0 )
+        {
+            hasUpgrade = semver.gt(Application_Version,dbVersion[0].version_str);
+        }
 
-        return c.json({ installed });
-    } catch {
-        return c.json({ installed: false });
+
+        return c.json({ installed: hasExistingVersion, upgradeable: hasUpgrade, version: dbVersion[0].version_str, package_version: Application_Version });
+    } catch (error) {
+        // @ts-ignore
+        return c.json({ installed: false, error: `${error.message}` });
     }
 });
 
@@ -26,6 +36,8 @@ installStatus.get('/', (c) => {
 installStatus.post('/migrate', async (c) => {
     try {
         await migrate(db, { migrationsFolder: 'server/db/migrations' });
+        await db.insert(version).values({item: 'honeycomb-core', version_str: Application_Version})
+            .onDuplicateKeyUpdate({set: { version_str: Application_Version }});
         return c.json({ success: true });
     } catch (err) {
         console.error('Migration failed:', err);
