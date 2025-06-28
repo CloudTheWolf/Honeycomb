@@ -15,6 +15,5 @@ const apiRoutes = app.basePath('/api')
     .route('/install',installStatusRouter)
 
 app.use('*', serveStatic({ root: './client/dist' }))
-app.use('*', serveStatic({ path: './client/dist/index.html' }))
 
 export default app;
