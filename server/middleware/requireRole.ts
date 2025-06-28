@@ -29,7 +29,7 @@ export function requireRole(allowedRoles: UserRole[]) {
 /***
  * Allow users with at least the specified role
  * @param {UserRole} minimumRole Minimum Required Role to access this endpoint
- */
+ */ 
 export function requireMinimumRole(minimumRole: UserRole) {
     return createMiddleware(async (c, next) => {
         const token =getCookie(c,'session')
