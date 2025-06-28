@@ -3,34 +3,43 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {useAuth} from "@/context/auth-context";
+import {useNavigate} from "@tanstack/react-router";
+import {useState} from "react";
 
 export function LoginForm({
                             className,
                             ...props
                           }: React.ComponentProps<'div'>) {
-  const form = useForm({
+    const { setAuthenticated, refreshUser } = useAuth()
+    const navigate = useNavigate()
+    const [loginError, setLoginError] = useState<string | null>(null)
+    const form = useForm({
     defaultValues: {
       username: '',
       password: '',
     },
     onSubmit: async ({ value }) => {
-      try {
+
         const res = await fetch('/api/authentication/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(value),
         })
 
-        if (!res.ok) throw new Error('Login failed')
+        if (!res.ok) {
+            try {
+                const data = await res.json()
+                setLoginError(data.error ?? 'Invalid Credentials')
+            } catch {
+                setLoginError('Invalid credentials')
+            }
+            return
+        }
 
-        const json = await res.json()
-        console.log('Login success:', json)
-
-        // You might want to redirect or refresh the user context
-      } catch (err) {
-        console.error(err)
-        alert('Login failed. Please check your credentials.')
-      }
+        setAuthenticated(true)
+        await refreshUser()
+        navigate({ to: '/dashboard', replace: true })
     },
   })
 
@@ -84,7 +93,11 @@ export function LoginForm({
                       </div>
                   )}
               />
-
+                {loginError && (
+                    <div className="text-sm text-red-500 font-medium">
+                        {loginError}
+                    </div>
+                )}
               <Button type="submit" className="w-full" disabled={form.state.isSubmitting}>
                 {form.state.isSubmitting ? 'Logging in…' : 'Login'}
               </Button>
