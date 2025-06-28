@@ -1,5 +1,3 @@
-import { readFileSync, existsSync } from 'fs';
-import { parse } from 'dotenv';
 import {Hono} from "hono";
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { db } from '@server/db/db';
